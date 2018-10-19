@@ -40,3 +40,14 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
     ```
 ## Ehereum Javascript API: [Web3](https://web3js.readthedocs.io/en/1.0/).
 
+
+## Deployment
+
+1. Deploy Smart Contracts
+    ```javascript
+    truffle migrate --compile-all --reset --network ganache
+    ```
+
+
+
+

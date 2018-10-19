@@ -2,6 +2,9 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
+# File Storage is powered by [Interplanetary File System(IPFS)](https://ipfs.io/):
+[IPFS Github](https://github.com/ipfs/ipfs).
+
 
 # Deployment tool: Truffle
 

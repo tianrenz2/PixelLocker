@@ -36,5 +36,5 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
     // Serves the front-end on http://localhost:3000
     npm run dev
     ```
-
+## Ehereum Javascript API: [Web3](https://web3js.readthedocs.io/en/1.0/).
 

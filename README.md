@@ -43,9 +43,15 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Deployment
 
+In src/ directory, do the following things:
+
 1. Deploy Smart Contracts
     ```javascript
     truffle migrate --compile-all --reset --network ganache
+    ```
+2. Run React
+    ```javascript
+    npm start
     ```
 
 

@@ -1,13 +1,14 @@
 
-# Frontend: React JS:
+## Frontend: React JS:
 
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
-# File Storage is powered by [Interplanetary File System(IPFS)](https://ipfs.io/):
+## File Storage is powered by [Interplanetary File System(IPFS)](https://ipfs.io/):
 [IPFS Github](https://github.com/ipfs/ipfs).
 
+## [MetaMask](https://metamask.io/): a general wallet for DApps
 
-# Deployment Tool: Truffle
+## Deployment Tool: Truffle
 
 ## Installation
 

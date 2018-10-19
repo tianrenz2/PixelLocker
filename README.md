@@ -6,7 +6,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 [IPFS Github](https://github.com/ipfs/ipfs).
 
 
-# Deployment tool: Truffle
+# Deployment Tool: Truffle
 
 ## Installation
 

@@ -44,6 +44,8 @@ Make sure your MetaMask is on, this is your wallet on this platform.
 
 ## Deployment
 
+For testing it locally, make sure the ganache is running and there are accounts with money in the local network.
+
 In src/ directory, do the following things:
 
 1. Deploy Smart Contracts

@@ -7,6 +7,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 [IPFS Github](https://github.com/ipfs/ipfs).
 
 ## [MetaMask](https://metamask.io/): a general wallet for DApps
+Make sure your MetaMask is on, this is your wallet on this platform.
 
 ## Deployment Tool: Truffle
 

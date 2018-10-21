@@ -30,3 +30,45 @@
 img {
     pointer-events: none;
 }
+
+.basicButton{
+  border: none;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  text-decoration: none;
+  font-weight: bold;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 12px;
+}
+
+
+/* popup window style */
+.popup{
+  background-color: #FFFF00;
+  border-radius: 12px;
+}
+
+.postTitle{
+  font-size: 40px;
+  font-family: monospace;
+}
+
+.postInput{
+  font-family: cursive;
+}
+
+.propose{
+  background-color: #F89209;
+}
+
+.post{
+  background-color: #F5E40C;
+}
+
+.uploadfile{
+  background-color: #0DE6DC;
+}

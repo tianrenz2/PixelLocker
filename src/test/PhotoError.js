@@ -18,6 +18,8 @@ contract('Phototrade', function(accounts){
   var imghash2 = "";
 
   var buyitemId1 = 1;
+  var newPrice1 = 15;
+  var newPrice2 = 20;
 
   it("Sell the first photo", function(){
     return Phototrade.deployed().then(function(instance){
@@ -63,56 +65,73 @@ contract('Phototrade', function(accounts){
     });
   });
 
-
-  it("Buy the first photo", function(){
-    return photoinstance.buyItem(1,
-      {from: buyer,
-       value: web3.toWei(itemPrice1)
-     }).then(function(receipt){
+    it("Buyer1 proposes a price to item1", function(){
+      return photoinstance.proposePrice(
+        1, newPrice1, {from: buyer}).then(function(receipt){
+        // check event
         assert.equal(receipt.logs.length, 1, "one event should have been triggered");
-        assert.equal(receipt.logs[0].event, "buyItemLog", "event should be LogBuyItem");
-        assert.equal(receipt.logs[0].args._id.toNumber(), 1, "artile id should be 1");
-        assert.equal(receipt.logs[0].args._seller, seller, "event seller must be " + seller);
-        assert.equal(receipt.logs[0].args._buyer, buyer, "event buyer must be " + buyer);
-        assert.equal(receipt.logs[0].args._title, itemTitle1, "event article name must be " + itemTitle1);
-        assert.equal(receipt.logs[0].args._price.toNumber(), web3.toWei(itemPrice1, "ether"), "event article price must be " + web3.toWei(itemPrice1, "ether"));
-        assert.equal(receipt.logs[0].args._numbuyers.toNumber(), 1, "buyers should be 1");
+        assert.equal(receipt.logs[0].event, "proposeItemLog", "event should be proposeItemLog");
+        assert.equal(receipt.logs[0].args._id.toNumber(), 1, "id must be 1");
+        assert.equal(receipt.logs[0].args._curBuyer, buyer, "event seller must be " + seller);
 
-     });
-  })
+        assert.equal(receipt.logs[0].args._price.toNumber(), newPrice1, "price should be "+newPrice1);
 
-  it("Buy the second photo", function(){
-    return photoinstance.buyItem(2,
-      {from: buyer,
-       value: web3.toWei(itemPrice2)
-     }).then(function(receipt){
+        return photoinstance.getNumberOfItems();
+      }).then(function(data){
+        assert.equal(data, 2, "Number of items should be 2");
+      });
+    });
+
+
+    it("Buyer2 proposes a price for item2", function(){
+      return photoinstance.proposePrice(
+        2, newPrice2, {from: buyer2}).then(function(receipt){
+        // check event
         assert.equal(receipt.logs.length, 1, "one event should have been triggered");
-        assert.equal(receipt.logs[0].event, "buyItemLog", "event should be LogBuyItem");
-        assert.equal(receipt.logs[0].args._id.toNumber(), 2, "artile id should be 1");
-        assert.equal(receipt.logs[0].args._seller, seller, "event seller must be " + seller);
-        assert.equal(receipt.logs[0].args._buyer, buyer, "event buyer must be " + buyer);
-        assert.equal(receipt.logs[0].args._title, itemTitle2, "event article name must be " + itemTitle2);
-        assert.equal(receipt.logs[0].args._price.toNumber(), web3.toWei(itemPrice2, "ether"), "event article price must be " + web3.toWei(itemPrice2, "ether"));
-        assert.equal(receipt.logs[0].args._numbuyers.toNumber(), 1, "buyers should be 1");
-        assert.equal(receipt.logs[0].args._status, true, "buyer's status should be true");
-     });
-  })
+        assert.equal(receipt.logs[0].event, "proposeItemLog", "event should be proposeItemLog");
+        assert.equal(receipt.logs[0].args._id.toNumber(), 2, "id must be 2");
+        assert.equal(receipt.logs[0].args._curBuyer, buyer2, "event seller must be " + seller);
 
-  it("Buyer2 buy item 2", function(){
-    return photoinstance.buyItem(2,
-      {from: buyer2,
-       value: web3.toWei(itemPrice2)
-     }).then(function(receipt){
-        assert.equal(receipt.logs.length, 1, "one event should have been triggered");
-        assert.equal(receipt.logs[0].event, "buyItemLog", "event should be LogBuyItem");
-        assert.equal(receipt.logs[0].args._id.toNumber(), 2, "artile id should be 1");
-        assert.equal(receipt.logs[0].args._seller, seller, "event seller must be " + seller);
-        assert.equal(receipt.logs[0].args._buyer, buyer2, "event buyer must be " + buyer2);
-        assert.equal(receipt.logs[0].args._title, itemTitle2, "event article name must be " + itemTitle2);
-        assert.equal(receipt.logs[0].args._price.toNumber(), web3.toWei(itemPrice2, "ether"), "event article price must be " + web3.toWei(itemPrice2, "ether"));
-        assert.equal(receipt.logs[0].args._numbuyers.toNumber(), 2, "buyers should be 2");
-        assert.equal(receipt.logs[0].args._status, true, "buyer's status should be true");
-     });
-  })
+        assert.equal(receipt.logs[0].args._price.toNumber(), newPrice2, "price should be "+newPrice2);
+
+        return photoinstance.getNumberOfItems();
+      }).then(function(data){
+        assert.equal(data, 2, "Number of items should be 2");
+      });
+    });
+
+  //
+  // it("Buyer 1 buys the first photo", function(){
+  //   return photoinstance.buyItem(1,
+  //     {from: buyer,
+  //    }).then(function(receipt){
+  //       assert.equal(receipt.logs.length, 1, "one event should have been triggered");
+  //       assert.equal(receipt.logs[0].event, "buyItemLog", "event should be LogBuyItem");
+  //       assert.equal(receipt.logs[0].args._id.toNumber(), 1, "artile id should be 1");
+  //       assert.equal(receipt.logs[0].args._seller, seller, "event seller must be " + seller);
+  //       assert.equal(receipt.logs[0].args._buyer, buyer, "event buyer must be " + buyer);
+  //       assert.equal(receipt.logs[0].args._title, itemTitle1, "event article name must be " + itemTitle1);
+  //       assert.equal(receipt.logs[0].args._price.toNumber(), newPrice1, "event article price must be " + web3.toWei(itemPrice1, "ether"));
+  //       assert.equal(receipt.logs[0].args._numbuyers.toNumber(), 1, "buyers should be 1");
+  //
+  //    });
+  // })
+  //
+  //
+  // it("Buyer2 buyers item 2", function(){
+  //   return photoinstance.buyItem(2,
+  //     {from: buyer2
+  //    }).then(function(receipt){
+  //       assert.equal(receipt.logs.length, 1, "one event should have been triggered");
+  //       assert.equal(receipt.logs[0].event, "buyItemLog", "event should be LogBuyItem");
+  //       assert.equal(receipt.logs[0].args._id.toNumber(), 2, "artile id should be 1");
+  //       assert.equal(receipt.logs[0].args._seller, seller, "event seller must be " + seller);
+  //       assert.equal(receipt.logs[0].args._buyer, buyer2, "event buyer must be " + buyer2);
+  //       assert.equal(receipt.logs[0].args._title, itemTitle2, "event article name must be " + itemTitle2);
+  //       assert.equal(receipt.logs[0].args._price.toNumber(), newPrice2, "event article price must be " + web3.toWei(itemPrice2, "ether"));
+  //       assert.equal(receipt.logs[0].args._numbuyers.toNumber(), 2, "buyers should be 2");
+  //       assert.equal(receipt.logs[0].args._status, true, "buyer's status should be true");
+  //    });
+  // })
 
 });

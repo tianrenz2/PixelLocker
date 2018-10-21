@@ -7,12 +7,14 @@ contract Phototrade is Ownable {
   struct Item{
     uint id;
     address seller;
+    address curBuyer;
     mapping (address => bool) buyers;
     string title;
     string description;
     string imghash;
     uint256 price;
     uint numbuyers;
+    uint timeCreate;
   }
 
   mapping (uint => Item) public items;
@@ -42,6 +44,12 @@ contract Phototrade is Ownable {
     bool _status
   );
 
+  event proposeItemLog(
+    uint indexed _id,
+    address indexed _curBuyer,
+    uint256 _price
+  );
+
 
   function sellItem(string _title, string _description, string _imghash, uint256 _price) public{
 
@@ -53,28 +61,28 @@ contract Phototrade is Ownable {
     items[itemCounter].description = _description;
     items[itemCounter].imghash = _imghash;
     items[itemCounter].price = _price;
+    items[itemCounter].timeCreate = block.timestamp;
     items[itemCounter].numbuyers = 0;
     sellItemLog(itemCounter, msg.sender, _title, _price, 0);
   }
 
 
+  function proposePrice(uint _id, uint _proPrice) payable public{
+
+    items[_id].price = _proPrice;
+    items[_id].curBuyer = msg.sender;
+    proposeItemLog(_id, items[_id].curBuyer, items[_id].price);
+  }
+
+
   function buyItem(uint _id) payable public{
-    require(itemCounter>0);
-    require(_id > 0 && _id <= itemCounter);
-
     Item storage item = items[_id];
-    require(item.seller != 0x0);
-
-    require(msg.sender != item.seller);
-    require(item.buyers[msg.sender] == false);
-    require(msg.value == item.price);
-
     item.buyers[msg.sender] = true;
 
-    item.seller.transfer(msg.value);
+    item.seller.transfer(item.price);
 
     item.numbuyers++;
-    buyItemLog(item.id, item.seller, msg.sender, item.title, item.price, item.numbuyers, item.buyers[msg.sender]);
+    buyItemLog(item.id, item.seller, item.curBuyer, item.title, item.price, item.numbuyers, item.buyers[msg.sender]);
   }
 
   function getNumberOfItems() public view returns(uint){

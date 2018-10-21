@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
-import { Item } from './Item';
-import logo from './pic/pic1.jpg';
 
+import logo from './pic/pic1.jpg';
+import web3 from './web3';
+import Popup from "reactjs-popup";
+import { Button } from 'reactstrap';
+import { Provider as AlertProvider } from 'react-alert'
 
 class Itemlist extends React.Component {
     constructor(props) {
@@ -9,24 +12,57 @@ class Itemlist extends React.Component {
         this.state = {
             items: [
 
-            ],
+            ]
         }
+        this.buyItem = this.buyItem.bind(this);
+        this.addItem = this.addItem.bind(this);
     }
 
-    add = (_title, _description,_imghash, _price) => {
-      console.log(_imghash);
+    addItem = (_itemId, _title, _description,_imghash, _price, _seller) => {
+      console.log("Image Hashes:" + _imghash);
       this.setState({
         items: this.state.items.concat({
-        title: _title,
-        description: _description,
-        price: _price,
-        imghash: _imghash
+          title: _title,
+          description: _description,
+          price: _price,
+          imghash: _imghash,
+          itemId: _itemId,
+          seller: _seller
+        })
+      });
+    }
+
+    bindSellerInfo = (photoinstance, account, balance) => {
+      this.buyItem = this.buyItem.bind(this);
+
+      this.setState({
+        photoinstance: photoinstance,
+        account: account,
+        balance: balance
+      });
+      // console.log("bindSellerInfo:" + this.buyItem);
+    }
+
+    buyItem = (itemId) => {
+      var price = this.state.price;
+      console.log(price + ":" + this.state.balance);
+
+      this.state.photoinstance.proposePrice(itemId, web3.utils.toWei(price.toString()), {from: this.state.account}).then(function(data){
+        console.log(data);
       })
+
+    }
+
+    updateInputProposePrice = (evt) => {
+      console.log(evt.target.value);
+      this.setState({
+        price: evt.target.value
       });
     }
 
     render() {
       let data = this.state.items;
+      // console.log(this.buyItem);
       const ColoredLine = ({ color }) => (
           <hr
               style={{
@@ -37,23 +73,41 @@ class Itemlist extends React.Component {
           />
       );
       return (
-        // <div>
-        // {
-          data.map(function(d, idx){
-           return (
+          data.map(function(element, idx){
+            // console.log(this.buyItem);
+            return(
              <div>
-             <h1>
-                Title:{d.title}  Price:{d.price}  Description:{d.description}
-              </h1>
-              <img src={d.imghash} width="200" alt="boohoo" className="img-responsive"/>
-              <button onClick=""> Buy </button>
+             <hr>
+             </hr>
+                <h1>
+                  {element.title}
+                </h1><h4> posted by {element.seller}</h4>
+                <h2>
+                Description: {element.description}
+                </h2>
+                <p>Price: {element.price} Ether</p>
+                <img src={element.imghash} width="300" alt="Image not able to show" className="img-responsive"/>
+                <br/>
+                <Popup
+                    trigger={<button className="basicButton propose">BID</button>}
+                    modal
+                    closeOnDocumentClick
+                    className = "popup"
+                >
+                <h2 className="postTitle"> I want to bid !</h2>
+                  <label>
+                  <h3 className="postInput">
+                    New Price: <input  onChange={this.updateInputProposePrice} type="text" name="name" /></h3>
+                  </label>
+                  <button onClick = {this.buyItem.bind(this, element.itemId)}> Propose </button>
+                </Popup>
+
              </div>
-           )
-         })
-       // }
-       //  </div>
-      );
+
+           );
+         }.bind(this))
+      )
     }
-}
+  }
 
 export { Itemlist };

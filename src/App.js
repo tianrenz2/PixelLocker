@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+
 import logo from './logo.svg';
 import './App.css';
 import ipfs from './ipfs';
@@ -10,6 +11,7 @@ import web3 from './web3';
 import photoArtifact from './Phototrade';
 
 import TruffleContract from 'truffle-contract'
+import { Button } from 'reactstrap';
 
 class App extends Component {
   constructor(props) {
@@ -21,7 +23,8 @@ class App extends Component {
       title:'',
       description:'',
       price:0,
-      photoinstance: null
+      photoinstance: null,
+      base_ipfs_url:"https://gateway.ipfs.io/ipfs/"
     }
     // console.log(photocontract);
     this.child = React.createRef();
@@ -56,18 +59,23 @@ class App extends Component {
      this.setState({buffer});
  };
 
- getAccount = async() => {
+getAccount = async() => {
    web3.eth.getCoinbase(function(err, account) {
     if(err === null) {
       this.setState({account:account})
-      console.log(account);
+      console.log("Getting Coinbase " + account);
       web3.eth.getBalance(account, function(err, balance) {
+        console.log("Getting Balance " + balance);
         if(err === null) {
-          console.log(balance);
+          console.log("Account Balance:" + balance);
           this.setState({balance:web3.utils.fromWei(balance, "ether")})
+        }else {
+          console.log("Account Balance 2 Err:" + err);
         }
       }.bind(this))
-  }
+    }else{
+      console.log("Account Balance 1 Err:" + err);
+    }
 }.bind(this));
 
 }
@@ -80,21 +88,24 @@ class App extends Component {
 
 
  reloadItem (){
+   console.log("Reloading Items");
     this.getAccount();
     var photoworldInstance = null
     // console.log(photoinstance.items)
     this.state.photoinstance.deployed().then(function(instance){
       photoworldInstance = instance
       return photoworldInstance.getNumberOfItems().then(function(data){
-        console.log(data.toNumber());
         for (var i= 1; i<=data.toNumber(); i++){
           photoworldInstance.items(i).then(function(item){
-            console.log(item);
-            this.child.current.add(item[2],item[3],item[4],window.web3.fromWei(item[5].toNumber()))
+            console.log("Loading items: " + item);
+
+            this.child.current.addItem(item[0].toNumber(),item[3], item[4],this.state.base_ipfs_url + item[5],web3.utils.fromWei(item[6].toString()), item[1]);
           }.bind(this))
         }
+        this.child.current.bindSellerInfo(photoworldInstance, this.state.account, this.state.balance);
       }.bind(this))
     }.bind(this))
+
  }
 
  sellItem(title, description, imghash,price){
@@ -108,7 +119,7 @@ class App extends Component {
 
 
   onClick = () => {
-    this.child.current.add("hashhash")
+    this.child.current.addItem("hashhash")
   };
 
   onSubmit = async (event) => {
@@ -121,15 +132,22 @@ class App extends Component {
     //save document to IPFS,return its hash#, and set hash# to state
     //https://github.com/ipfs/interface-ipfs-core/blob/master/SPEC/FILES.md#add
       await ipfs.add(this.state.buffer, (err, ipfsHash) => {
-        console.log(ipfsHash[0].hash);
+        console.log("Image hash: " + ipfsHash[0].hash);
 
         //setState by setting ipfsHash to ipfsHash[0].hash
         this.setState({ ipfsHash:ipfsHash[0].hash });
 
         this.state.photoinstance.deployed().then(function(instance){
-          this.child.current.add(this.state.title, this.state.description, "https://gateway.ipfs.io/ipfs/"+ipfsHash[0].hash,this.state.price)
-          return instance.sellItem(this.state.title, this.state.description, ipfsHash[0].hash, window.web3.toWei(this.state.price),{from: this.state.account})
-
+          return instance.sellItem(this.state.title,
+            this.state.description,
+            ipfsHash[0].hash,
+            window.web3.toWei(this.state.price),
+            {from: this.state.account}).then(function(receipt){
+              //Call addItem function in the child itemlist.js, (id,title,description,imagehash,price)
+              console.log("Published Successfully: " + receipt);
+              console.log("Your Image Address: " + "https://gateway.ipfs.io/ipfs/"+ipfsHash[0].hash);
+              this.child.current.addItem(receipt.logs[0].args._id.toNumber(), this.state.title, this.state.description, "https://gateway.ipfs.io/ipfs/"+ipfsHash[0].hash,this.state.price, this.state.account)
+            }.bind(this))
         }.bind(this)).then(function(result){
           console.log(result);
         }).catch(function(err) {
@@ -164,29 +182,36 @@ class App extends Component {
         <h5 id="acc">My Id {this.state.account}</h5>
         <h1>My Pocket: {this.state.balance} ETH</h1>
         <Popup
-          trigger={<button className="button">Post My Photograph</button>}
-          modal
-          closeOnDocumentClick
-          >
-          <span> Modal content </span>
-          <form>
-          <label>
-            Title:
-            <input  onChange={this.updateInputTitle} type="text" name="name" />
-          </label>
-          <label>
-            Description:
-            <input  onChange={this.updateInputDes} type="text" name="name" />
-          </label>
-          <label>
-            Price:
-            <input  onChange={this.updateInputPrice} type="text" name="name" />
-          </label>
-          <input type = "file" onChange = {this.capTureFile}/>
-          <button onClick = {this.onSubmit}>Submit</button>
-        </form>
-          </Popup>
-          <Itemlist ref={this.child}/>
+            className = "popup"
+            trigger={<button className="basicButton post">Post My Photograph</button>}
+            modal
+            closeOnDocumentClick>
+              <h2 className="postTitle"> Post My Photograph </h2>
+              <form>
+
+              <div>
+                <label>
+                  <h3 className="postInput">Title: <input  onChange={this.updateInputTitle} type="text" name="name" /></h3>
+                </label>
+              </div>
+
+              <div>
+                <label>
+                  <h3 className="postInput">Description: <input  onChange={this.updateInputDes} type="text" name="name" /> </h3>
+                </label>
+              </div>
+
+              <div>
+                <label>
+                  <h3 className="postInput">Price: <input  onChange={this.updateInputPrice} type="text" name="name"/></h3>
+                </label>
+              </div>
+
+              <input type = "file" onChange = {this.capTureFile}/>
+              <button class="basicButton post" onClick = {this.onSubmit} >Yes</button>
+            </form>
+      </Popup>
+      <Itemlist ref={this.child}/>
         </div>
       );
   }

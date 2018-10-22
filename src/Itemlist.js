@@ -14,10 +14,12 @@ class Itemlist extends React.Component {
 
             ]
         }
+        //Attach the functions to this class reference
         this.buyItem = this.buyItem.bind(this);
         this.addItem = this.addItem.bind(this);
     }
 
+//Append an item to the list
     addItem = (_itemId, _title, _description,_imghash, _price, _seller) => {
       console.log("Image Hashes:" + _imghash);
       this.setState({
@@ -32,6 +34,7 @@ class Itemlist extends React.Component {
       });
     }
 
+//Get data of ethereum instance and account from parent js
     bindSellerInfo = (photoinstance, account, balance) => {
       this.buyItem = this.buyItem.bind(this);
 
@@ -43,6 +46,7 @@ class Itemlist extends React.Component {
       // console.log("bindSellerInfo:" + this.buyItem);
     }
 
+//Buy item
     buyItem = (itemId) => {
       var price = this.state.price;
       console.log(price + ":" + this.state.balance);
@@ -53,6 +57,7 @@ class Itemlist extends React.Component {
 
     }
 
+//Listening to proposed price input
     updateInputProposePrice = (evt) => {
       console.log(evt.target.value);
       this.setState({
@@ -61,6 +66,7 @@ class Itemlist extends React.Component {
     }
 
     render() {
+      //Get items reference from this.state
       let data = this.state.items;
       // console.log(this.buyItem);
       const ColoredLine = ({ color }) => (
@@ -73,6 +79,7 @@ class Itemlist extends React.Component {
           />
       );
       return (
+        //Iterate the items and adapt them into a listview
           data.map(function(element, idx){
             // console.log(this.buyItem);
             return(

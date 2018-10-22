@@ -21,6 +21,8 @@ contract('Phototrade', function(accounts){
   var newPrice1 = 15;
   var newPrice2 = 20;
 
+
+//Test selling the first photograph
   it("Sell the first photo", function(){
     return Phototrade.deployed().then(function(instance){
       photoinstance = instance
@@ -44,7 +46,7 @@ contract('Phototrade', function(accounts){
     });
   });
 
-
+  //Test selling the second photograph
   it("Sell the second photo", function(){
     return photoinstance.sellItem(
       itemTitle2, itemDes2, imghash2, web3.toWei(itemPrice2,"ether"),
@@ -65,6 +67,7 @@ contract('Phototrade', function(accounts){
     });
   });
 
+  //Test bidding
     it("Buyer1 proposes a price to item1", function(){
       return photoinstance.proposePrice(
         1, newPrice1, {from: buyer}).then(function(receipt){
@@ -82,7 +85,7 @@ contract('Phototrade', function(accounts){
       });
     });
 
-
+    //Test bidding
     it("Buyer2 proposes a price for item2", function(){
       return photoinstance.proposePrice(
         2, newPrice2, {from: buyer2}).then(function(receipt){
@@ -100,6 +103,7 @@ contract('Phototrade', function(accounts){
       });
     });
 
+    // Test Buying
   //
   // it("Buyer 1 buys the first photo", function(){
   //   return photoinstance.buyItem(1,

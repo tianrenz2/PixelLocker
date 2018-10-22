@@ -16,6 +16,7 @@ import { Button } from 'reactstrap';
 class App extends Component {
   constructor(props) {
     super(props);
+    //State stores basic global data
     this.state = {
       buffer:'',
       account: 0x0,
@@ -26,9 +27,12 @@ class App extends Component {
       photoinstance: null,
       base_ipfs_url:"https://gateway.ipfs.io/ipfs/"
     }
-    // console.log(photocontract);
+
+    //Attaching child reference so that this class can call child's functions
     this.child = React.createRef();
     // this.getAccoundInfo = this.getAccoundInfo.bind(this)
+
+    //Bind the functions in this class so they can be called globally
     this.reloadItem = this.reloadItem.bind(this);
     this.getAccount = this.getAccount.bind(this);
     this.updateInputPrice = this.updateInputPrice.bind(this);
@@ -42,6 +46,7 @@ class App extends Component {
     // this.getBalance = this.getBalance.bind(this)
   }
 
+//File uploading processing
   capTureFile = (event) => {
     event.stopPropagation()
     event.preventDefault()
@@ -59,6 +64,7 @@ class App extends Component {
      this.setState({buffer});
  };
 
+// Get account information from Metamask
 getAccount = async() => {
    web3.eth.getCoinbase(function(err, account) {
     if(err === null) {
@@ -80,13 +86,14 @@ getAccount = async() => {
 
 }
 
+//Initialize the smart contract
   initContract= async()=>{
     var photoinstance = TruffleContract(photoArtifact)
     await photoinstance.setProvider(web3.currentProvider)
     await this.setState({photoinstance: photoinstance})
   }
 
-
+//Reloading data from the ethereum
  reloadItem (){
    console.log("Reloading Items");
     this.getAccount();
@@ -95,19 +102,21 @@ getAccount = async() => {
     this.state.photoinstance.deployed().then(function(instance){
       photoworldInstance = instance
       return photoworldInstance.getNumberOfItems().then(function(data){
+        //Get the data of item list as an array, then iterate it to put photographs into the layout
         for (var i= 1; i<=data.toNumber(); i++){
           photoworldInstance.items(i).then(function(item){
             console.log("Loading items: " + item);
-
             this.child.current.addItem(item[0].toNumber(),item[3], item[4],this.state.base_ipfs_url + item[5],web3.utils.fromWei(item[6].toString()), item[1]);
           }.bind(this))
         }
+        //Pass the variables into child class, so he can also reference them.
         this.child.current.bindSellerInfo(photoworldInstance, this.state.account, this.state.balance);
       }.bind(this))
     }.bind(this))
-
  }
 
+
+//Sell an item, calling ethereum API
  sellItem(title, description, imghash,price){
    var photoworldInstance = null
    // console.log(photoinstance.items)
@@ -117,11 +126,7 @@ getAccount = async() => {
    }.bind(this))
  }
 
-
-  onClick = () => {
-    this.child.current.addItem("hashhash")
-  };
-
+//Submit new item and write it to block chain
   onSubmit = async (event) => {
       event.preventDefault();
      //bring in user's metamask account address
@@ -129,9 +134,10 @@ getAccount = async() => {
 
       console.log('Sending from Metamask account: ' + this.state.account);
 
-    //save document to IPFS,return its hash#, and set hash# to state
+    //save document to IPFS,return its hash, and set hash to state
     //https://github.com/ipfs/interface-ipfs-core/blob/master/SPEC/FILES.md#add
       await ipfs.add(this.state.buffer, (err, ipfsHash) => {
+        //Wait for the file is uploaded onto IPFS
         console.log("Image hash: " + ipfsHash[0].hash);
 
         //setState by setting ipfsHash to ipfsHash[0].hash
@@ -143,7 +149,7 @@ getAccount = async() => {
             ipfsHash[0].hash,
             window.web3.toWei(this.state.price),
             {from: this.state.account}).then(function(receipt){
-              //Call addItem function in the child itemlist.js, (id,title,description,imagehash,price)
+              //Call addItem function in the child itemlist.js, (id,title,description,imagehash,price, account)
               console.log("Published Successfully: " + receipt);
               console.log("Your Image Address: " + "https://gateway.ipfs.io/ipfs/"+ipfsHash[0].hash);
               this.child.current.addItem(receipt.logs[0].args._id.toNumber(), this.state.title, this.state.description, "https://gateway.ipfs.io/ipfs/"+ipfsHash[0].hash,this.state.price, this.state.account)
@@ -156,18 +162,24 @@ getAccount = async() => {
       }); //await ipfs.add
 }; //onSubmit
 
+
+//Listening on price input
   updateInputPrice(evt) {
     console.log(evt.target.value);
     this.setState({
       price: evt.target.value
     });
   }
+
+  //Listening on title input
   updateInputTitle(evt) {
     console.log(evt.target.value);
     this.setState({
       title: evt.target.value
     });
   }
+
+  //Listening on description input
   updateInputDes(evt) {
     console.log(evt.target.value);
     this.setState({
@@ -210,7 +222,6 @@ getAccount = async() => {
               <input type = "file" onChange = {this.capTureFile}/>
               <button class="basicButton post" onClick = {this.onSubmit} >Yes</button>
             </form>
-      </Popup>
       <Itemlist ref={this.child}/>
         </div>
       );

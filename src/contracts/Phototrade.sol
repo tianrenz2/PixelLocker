@@ -4,6 +4,7 @@ import "./Ownable.sol";
 
 contract Phototrade is Ownable {
 
+/*Structure of an Photograph object*/
   struct Item{
     uint id;
     address seller;
@@ -17,6 +18,7 @@ contract Phototrade is Ownable {
     uint timeCreate;
   }
 
+/*Global array to store all the items*/
   mapping (uint => Item) public items;
   uint itemCounter;
 
@@ -25,7 +27,8 @@ contract Phototrade is Ownable {
     return (local.id, local.seller, local.price, local.numbuyers);
   }
 
-  // events
+
+  // events for testing
   event sellItemLog(
     uint indexed _id,
     address indexed _seller,
@@ -50,7 +53,7 @@ contract Phototrade is Ownable {
     uint256 _price
   );
 
-
+//Sell an item, store item's information from 'item' array
   function sellItem(string _title, string _description, string _imghash, uint256 _price) public{
 
     itemCounter++;
@@ -66,7 +69,7 @@ contract Phototrade is Ownable {
     sellItemLog(itemCounter, msg.sender, _title, _price, 0);
   }
 
-
+//Bid, changing the current price of an item and current buyer.
   function proposePrice(uint _id, uint _proPrice) payable public{
 
     items[_id].price = _proPrice;
@@ -74,7 +77,7 @@ contract Phototrade is Ownable {
     proposeItemLog(_id, items[_id].curBuyer, items[_id].price);
   }
 
-
+//When the deal is actually going to be made, ethers get transferred to seller.
   function buyItem(uint _id) payable public{
     Item storage item = items[_id];
     item.buyers[msg.sender] = true;

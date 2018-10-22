@@ -139,7 +139,6 @@ getAccount = async() => {
       await ipfs.add(this.state.buffer, (err, ipfsHash) => {
         //Wait for the file is uploaded onto IPFS
         console.log("Image hash: " + ipfsHash[0].hash);
-
         //setState by setting ipfsHash to ipfsHash[0].hash
         this.setState({ ipfsHash:ipfsHash[0].hash });
 

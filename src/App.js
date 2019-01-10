@@ -133,7 +133,6 @@ getAccount = async() => {
       const accounts = await web3.eth.getAccounts();
 
       console.log('Sending from Metamask account: ' + this.state.account);
-
     //save document to IPFS,return its hash, and set hash to state
     //https://github.com/ipfs/interface-ipfs-core/blob/master/SPEC/FILES.md#add
       await ipfs.add(this.state.buffer, (err, ipfsHash) => {
@@ -221,7 +220,8 @@ getAccount = async() => {
               <input type = "file" onChange = {this.capTureFile}/>
               <button class="basicButton post" onClick = {this.onSubmit} >Yes</button>
             </form>
-      <Itemlist ref={this.child}/>
+            </Popup>
+      <Itemlist ref={this.child} account={this.state.account}/>
         </div>
       );
   }

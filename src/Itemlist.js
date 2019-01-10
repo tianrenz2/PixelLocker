@@ -12,11 +12,14 @@ class Itemlist extends React.Component {
         this.state = {
             items: [
 
-            ]
+            ],
+            account: props.account
         }
         //Attach the functions to this class reference
         this.buyItem = this.buyItem.bind(this);
         this.addItem = this.addItem.bind(this);
+        this.purchaseItem = this.purchaseItem.bind(this);
+        console.log(this.state.account);
     }
 
 //Append an item to the list
@@ -46,7 +49,7 @@ class Itemlist extends React.Component {
       // console.log("bindSellerInfo:" + this.buyItem);
     }
 
-//Buy item
+//Bid item
     buyItem = (itemId) => {
       var price = this.state.price;
       console.log(price + ":" + this.state.balance);
@@ -56,6 +59,21 @@ class Itemlist extends React.Component {
       })
 
     }
+
+//Buy items
+  purchaseItem = (itemId, price) => {
+    console.log(price + ":" + this.state.balance);
+    // if(this.state.balance <= price){
+    //   alert("Your balance is not enough");
+    //   return;
+    // }
+
+    this.state.photoinstance.buyItem(itemId,{from:this.state.account, value: web3.utils.toWei(price.toString(),"ether")}).then(function(data){
+      console.log(data);
+    })
+
+  }
+
 
 //Listening to proposed price input
     updateInputProposePrice = (evt) => {
@@ -108,7 +126,7 @@ class Itemlist extends React.Component {
                   </label>
                   <button onClick = {this.buyItem.bind(this, element.itemId)}> Propose </button>
                 </Popup>
-
+                <button onClick = {this.purchaseItem.bind(this, element.itemId, element.price)} className="basicButton propose">BUY</button>
              </div>
 
            );
